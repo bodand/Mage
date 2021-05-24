@@ -1,0 +1,9 @@
+_build*/
+.idea/
+cmake-build-*/
+
+*.exe
+*.dll
+*.lib
+*.so
+*.a

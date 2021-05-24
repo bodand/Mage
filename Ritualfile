@@ -1,0 +1,36 @@
+use vcs.
+use mage.
+
+/*
+ def mage:exe (name,
+               sources,
+               deps = [Symbol][]) {
+   let _Mana:type($name) _Tome:types:executable.
+   let _Mana:sources($name) $sources.
+   let _Mana:dependencies($name) $deps.
+ }.
+ */
+
+project('Mage).
+
+// Dependencies //
+extern("PCRE2",
+       vcs:svn("svn://vcs.pcre.org/pcre2/code/trunk", "pcre")).
+
+mage:exe('mage,
+         std:files("src/mage") | std:filter(std:pattern:glob("*.cxx"))).
+
+// Mage test suite //
+extern("Catch",
+       vcs:gh("catchorg/Catch2")).
+
+mage:exe('mage-test,
+         std:files("src/test") | std:filter(std:pattern:glob("*.cxx")),
+         [ 'Catch2::Catch2 ]).
+
+[[cli:subcmd("test")]]
+let test() {
+    let out mage:out('mage-test).
+    std:shell([ out ],
+              std:path:dir(out)).
+}.

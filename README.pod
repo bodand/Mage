@@ -1,0 +1,73 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ mage, ManaVM - The Mage build system
+
+=head1 SYNOPSIS
+
+The Mage build-system is an attempt at providing a build-tool
+that does not end up creating another standard and fail miserably.
+
+Mage is not a meta build-system: it does its job directly, without
+delegating the actual build step to something else. Think make, but
+without POSIX Make's inability to actuall do anything meaningful,
+GNU Make's needless extension barrage, and BSD makes' unportability.
+
+=head1 DESCRIPTION
+
+=head2 Why another?
+
+Mage is built with CMake package compatibility. While this makes things
+complicated for me on the insides, considering most of CMake's internal
+package creating mechanism is not documented it makes things easier for
+everyone else: there is no argument between who's package management is
+superior if Mage doesn't provide an alternative: it consumes a CMake
+project as it's own kin, and produces F<FooConfig.cmake> files which
+allows actual CMake projects to consume Mage projects with ease.
+
+Why? CMake is a de facto standard at this point. A shame really, but I do not
+believe that competitors like L<Build2|https://build2.org> have a chance,
+for the simple reason that there is already too much depending on CMake
+to change that. Mage is trying to live with CMake instead of extenguising
+it, like some others (rightfully) want to.
+
+A good example would be something like Gradle to Maven in Javaland. Gradle
+didn't invent a new package system: it simply uses Maven's ... everything.
+It only provided a new fronted for doing so: Groovy (Kotlin) instead of raw
+XML, which is painful to write manually. (Note: I left around Gradle 5.2 so
+things may have changed.)
+
+=head2 Compilation
+
+If you do not have in your possession, a working copy of Mage, you
+first need to build a future-compatible time-machine, and then bring
+back your Mage from the future where you'll've built it by then.
+
+The other option is to use the CMake system provided to build Mage.
+This allows building Mage without needing to have B<mage>. The CMake script
+is capable of doing everything there needs to be done with Mage to get
+a completely working installation ready. With this your build steps are
+probably going to be something like:
+
+ cmake -S. -B_build -G "Ninja Multi-Config"
+ cmake --build _build --config Release
+ cmake --install _build --prefix "foo/bar"
+
+If you already have a Mage available, the following is likely your way:
+
+ mage +install -C Release
+
+=head1 DOCUMENTATION
+
+Documentation both for ManaVM's API and for Chalk (the name of the language
+used in F<Ritualfile>) in the F<docs/> directory in POD format.
+
+=head1 LICENSE
+
+Mage and ManaVM are licensed under the BSD 3-Clause license. Dependencies'
+license and Mage's license text can be read in the F<LICENSE.txt> file.
+
+=cut

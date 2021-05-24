@@ -1,0 +1,85 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mana::regex, mana::regex::match_result - ManaVM regex API
+
+=head1 SYNOPSIS
+
+ #include <mana/regex.hxx>
+ mana::regex::regex(std::string_view regex,
+                    int flags = 0,
+                    bool do_jit = true);
+
+ mana::regex::match_result
+ mana::regex::match(std::string_view str,
+                    int flags = 0);
+
+ mana::regex::match_result::iterator
+ mana::regex::match_result::begin() const noexcept;
+
+ mana::regex::match_result::iterator
+ mana::regex::match_result::end() const noexcept;
+
+ bool
+ mana::regex::match_result::operator bool() const noexcept;
+
+ std::string_view
+ mana::regex::match_result::operator[](std::string_view name) const;
+
+ std::string_view
+ mana::regex::match_result::operator[](std::size_t idx) const;
+
+ std::size_t
+ mana::regex::match_result::size() const noexcept;
+
+=head1 EXAMPLES
+
+=head2 Construction and simple matching
+
+The following regex C<^(a(?:(?1)|\|)b)$> matches the equal number of C<a> and C<b>
+characters separated by a pipe (C<E<vert>>). The following code-snipped demonstrates
+how to create a regex object for it and use it to validate string input.
+
+ #include <mana/regex.hxx>
+
+ mana::regex re(R"_(^(a(?:(?1)|\|)b)$)_");
+
+ if (re.match("aaaa|bbbb")) {
+     std::cout << "correct\n";
+ } else {
+     std::cout << "incorrect\n";
+ }
+
+=head2 Indexed captures
+
+The regex used here captures different numbers in the text: S<C<^.*:\s(\d+).*:\s(\d+).*:\s(\d+)$>>.
+This allows us to get the three integer values in the example string.
+
+ #include <mana/regex.hxx>
+
+ mana::regex re(R"^.*:\s(\d+).*:\s(\d+).*:\s(\d+)$");
+
+ auto mch = re.match("a: 1, b: 2, c: 4");
+ for (std::size_t i = 0; i < mch.size(); ++i) {
+     std::cout << mch[i] << " "; // 1 2 3
+ }
+
+
+=head2 Named captures
+
+The regex is the same, except id defines groups C<a>, C<b>, and C<c>
+to allow referencing them: C<^.*:\s(?E<lt>aE<gt>\d+).*:\s(?E<lt>bE<gt>\d+).*:\s(?E<lt>cE<gt>\d+)$>.
+
+ #include <mana/regex.hxx>
+
+ mana::regex re(R"^a:\s(?<a>\d+).*:\s(?<b>\d+).*:\s(?<c>\d+)$");
+
+ auto mch = re.match("a: 1, b: 2, c: 4");
+ std::cout << "a: " << mch["a"] << "\n"; // a: 1
+ std::cout << "b: " << mch["b"] << "\n"; // b: 2
+ std::cout << "c: " << mch["c"] << "\n"; // c: 4
+
+=cut

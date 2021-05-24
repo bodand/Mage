@@ -1,0 +1,66 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+MANA_UNLIKELY, MANA_LIKELY, MANA_UNLIKELY_IF, MANA_LIKELY_IF, MANA_ABYSS - ManaVM extra QoL macros
+
+=head1 SYNOPSIS
+
+ MANA_LIKELY(cond...)
+ MANA_UNLIKELY(cond...)
+
+ MANA_LIKELY_IF(cond...) { ... } else { ... }
+ MANA_UNLIKELY_IF(cond...) { ... } else { ... }
+
+ MANA_ABYSS()
+
+=head1 DESCRIPTION
+
+The B<MANA_LIKELY(I<cond>)> and B<MANA_UNLIKELY(I<cond>)> macros wrap a compiler
+specific extension over the condition I<cond> which the compilers can use to aid
+in branch prediction. If a compiler does not support an in-line way of instructing
+the branch predictor, these macros do nothing.
+
+The B<MANA_LIKELY_IF(I<cond>)> and B<MANA_UNLIKELY_IF(I<cond>)> macros wrap a
+either the B<MANA_LIKELY(I<cond>)> or B<MANA_UNLIKELY(I<cond>)> macros respectively,
+or in case C++20 is used to compile, the standard C<[[likely]]> and C<[[unlikely]]>
+attributes. These macros are a replacement for the C<if> construct, to allow
+supporting the standard attributes.
+
+The B<MANA_ABYSS()> macro tells the compatible compilers that the code there is
+unreachable.
+
+=head1 EXAMPLES
+
+=head2 Likely/Unlikely
+
+The simple likely/unlikely scenario can be wrapped like so:
+
+ int retcode = do_processing(42);
+ if (MANA_UNLIKELY(PROCESS_FAILED(retcode))) {
+    /* handle unlikely error */
+ }
+
+This construct, however, is not recommended as it cannot provide correct C++20
+support, in case the project decides to adopt it. Therefore, instead, the
+following macros are to be used:
+
+ int retcode = do_processing(42);
+ MANA_UNLIKELY_IF(PROCESS_FAILED(retcode)) {
+   /* handle unlikely error */
+ }
+
+=head2 Unreachable
+
+ int x = get_some_int();
+ switch (x) {
+    case 1: return do_1();
+    case 2: return do_2();
+    case 3: return do_3();
+    default: ;
+ }
+ MANA_ABYSS();
+
+=cut
