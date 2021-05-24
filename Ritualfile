@@ -25,7 +25,7 @@ extern("Catch",
        vcs:gh("catchorg/Catch2")).
 
 mage:exe('mage-test,
-         std:files("src/test") | std:filter(std:pattern:glob("*.cxx")),
+         std:files("src/test", 'true) | std:filter(std:pattern:glob("*.cxx")),
          [ 'Catch2::Catch2 ]).
 
 [[cli:subcmd("test")]]

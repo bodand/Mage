@@ -26,3 +26,17 @@ MageTest("ManaVM regexes iterate through match without all capturing groups fill
          ManaVM/regex_capture_holey_iterator.cxx)
 
 ### Value ###
+MageTest("ManaVM value::make_value can properly create symbol value"
+         ManaVM/value_create_sym.cxx)
+MageTest("ManaVM value::make_value can properly create integer value"
+         ManaVM/value_create_int.cxx)
+MageTest("ManaVM value::make_value can properly create boolean value"
+         ManaVM/value_create_bool.cxx)
+MageTest("ManaVM sym_value checks equality properly"
+         ManaVM/value_eq_sym.cxx)
+MageTest("ManaVM int_value checks equality properly"
+         ManaVM/value_eq_int.cxx)
+MageTest("ManaVM bool_value checks equality properly"
+         ManaVM/value_eq_bool.cxx)
+MageTest("ManaVM values can check equality through references"
+         ManaVM/value_universal_equality.cxx)
