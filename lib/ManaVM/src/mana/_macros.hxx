@@ -56,3 +56,12 @@
 #else
 #    define MANA_ABYSS() ((void)0)
 #endif
+
+/* ======================== MANA_PURE()/MANA_CONST() ======================== */
+#ifdef __GNUC__
+#    define MANA_PURE() [[gnu::pure]]
+#    define MANA_CONST() [[gnu::const]]
+#else
+#    define MANA_PURE()
+#    define MANA_CONST()
+#endif

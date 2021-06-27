@@ -15,13 +15,7 @@ namespace mana::_aux {
     template<auto>
     struct universal_deleter;
 
-    template<class T, void (*Fn)(T*) noexcept>
-    struct universal_deleter<Fn> {
-        void
-        operator()(T* obj) const noexcept { Fn(obj); }
-    };
-
-    template<class T, void (*Fn)(T*)>
+    template<class T, class R, R (*Fn)(T*)>
     struct universal_deleter<Fn> {
         void
         operator()(T* obj) const { Fn(obj); }

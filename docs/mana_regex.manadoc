@@ -40,7 +40,7 @@ mana::regex, mana::regex::match_result - ManaVM regex API
 =head2 Construction and simple matching
 
 The following regex C<^(a(?:(?1)|\|)b)$> matches the equal number of C<a> and C<b>
-characters separated by a pipe (C<E<vert>>). The following code-snipped demonstrates
+characters separated by a pipe (C<E<verbar>>). The following code-snipped demonstrates
 how to create a regex object for it and use it to validate string input.
 
  #include <mana/regex.hxx>

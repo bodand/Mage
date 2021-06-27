@@ -7,7 +7,7 @@
 #   This auxilary CMake build system is responsible for handling the
 #   building of Mage on systems where Mage itself is not yet present.
 
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.20)
 
 ## CMake system setup ##########################################################
 ## Languages ##
@@ -23,15 +23,17 @@ cmake_policy(SET CMP0110 NEW) # add_test handles whitespace it test's name
 
 ## Modules #####################################################################
 include(CMakePackageConfigHelpers)
-include(GNUInstallDirs)
+include(CMakePushCheckState)
+include(CheckCXXSymbolExists)
 include(CheckIPOSupported)
-include(CheckPIESupported)
 include(CheckIncludeFile)
 include(CheckIncludeFiles)
-include(CheckSymbolExists)
-include(CheckCXXSymbolExists)
 include(CheckLibraryExists)
+include(CheckPIESupported)
 include(CheckStructHasMember)
+include(CheckSymbolExists)
+include(CheckTypeSize)
+include(GNUInstallDirs)
 include(InstallRequiredSystemLibraries)
 
 ## System capability checks ####################################################
@@ -55,6 +57,8 @@ set(CMAKE_CXX_STANDARD 20)
 ## Options #####################################################################
 option(MAGE_BUILD_TESTS
        "Build Mage and ManaVM tests [ON]" ON)
+option(MAGE_BUILD_DOCS
+       "Build Mage and ManaVM tests [ON]" ON)
 
 ## Targets #####################################################################
 ## Warnings ##
@@ -75,6 +79,7 @@ endif ()
 ## Dependencies ##
 find_package(Boost REQUIRED)
 add_subdirectory(lib/PCRE2)
+add_subdirectory(lib/SQLite)
 
 ## ManaVM ##
 add_subdirectory(lib/ManaVM)
@@ -88,4 +93,9 @@ target_link_libraries(mage ManaVM)
 if (MAGE_BUILD_TESTS)
     include(CTest)
     add_subdirectory(test)
+endif ()
+
+## Docs ########################################################################
+if (MAGE_BUILD_DOCS)
+    add_subdirectory(docs)
 endif ()

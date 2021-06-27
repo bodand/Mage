@@ -20,11 +20,12 @@ project(ManaVM
 add_library(ManaVM SHARED
             src/mana/regex.cxx src/mana/value.cxx src/mana/value/int_value.cxx
             src/mana/value/sym_value.cxx src/mana/value/bool_value.cxx
-            src/mana/visitors/equality_visitor.cxx
-            src/mana/visitors/basic_visitor.cxx)
+            src/mana/visitors/equality_visitor.cxx src/mana/db.cxx
+            src/mana/visitors/basic_visitor.cxx
+            src/mana/source_scanner.cxx)
 target_include_directories(ManaVM PUBLIC
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
                            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 ## Dependencies ################################################################
-target_link_libraries(ManaVM PRIVATE pcre2-8 pcre2-posix)
+target_link_libraries(ManaVM PRIVATE pcre2-8 pcre2-posix ManaSQL)

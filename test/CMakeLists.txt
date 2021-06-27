@@ -40,3 +40,31 @@ MageTest("ManaVM bool_value checks equality properly"
          ManaVM/value_eq_bool.cxx)
 MageTest("ManaVM values can check equality through references"
          ManaVM/value_universal_equality.cxx)
+
+### Source Scan ###
+MageTest("ManaVM source_glob can dissect relative glob expressions into path and glob"
+         ManaVM/source_glob_properly_dissects_relative_glob.cxx)
+MageTest("ManaVM source_glob can dissect absolute glob expressions into path and glob"
+         ManaVM/source_glob_properly_dissects_absolute_glob.cxx)
+MageTest("ManaVM source_glob can find fixed suffix searching globs"
+         ManaVM/source_glob_finds_globbing_on_suffixes.cxx)
+MageTest("ManaVM source_glob can find fixed stem searching globs"
+         ManaVM/source_glob_finds_globbing_on_stem.cxx)
+MageTest("ManaVM source_glob can handle '*.?xx'"
+         ManaVM/source_glob_finds_globbing_on_complexish_suffixes.cxx)
+MageTest("ManaVM source_glob errors on empty classes '[]'"
+         ManaVM/source_glob_errors_on_empty_classes.cxx)
+MageTest("ManaVM source_glob * auto-escapes following meta"
+         ManaVM/source_glob_star_autoescape_happens_as_docs_say.cxx)
+MageTest("ManaVM source_glob globs according to directory depth"
+         ManaVM/source_glob_globs_directory_depth_correctly.cxx)
+#MageTest("ManaVM source_scanner remembers target source glob"
+#         ManaVM/source_scanner_remembers_target_source_glob.cxx)
+
+foreach (file a.txt b.txt a.cxx
+              foobar.txt barfoo.txt
+              d.hxx foo.d
+              foo/a.txt bar/a.txt)
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/glob-test/${file}"
+         [[/* THIS FILE IS USED FOR TESTING GLOBBING - DO NOT REMOVE OR RENAME */]])
+endforeach ()

@@ -28,6 +28,8 @@ namespace mana {
         virtual std::unique_ptr<value>
         accept_visitor(const basic_visitor*) const = 0;
 
+        virtual ~value() = default;
+
         static std::unique_ptr<value>
         make_value();
         static std::unique_ptr<value>

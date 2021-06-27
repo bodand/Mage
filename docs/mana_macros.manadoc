@@ -16,6 +16,9 @@ MANA_UNLIKELY, MANA_LIKELY, MANA_UNLIKELY_IF, MANA_LIKELY_IF, MANA_ABYSS - ManaV
 
  MANA_ABYSS()
 
+ MANA_PURE()
+ MANA_CONST()
+
 =head1 DESCRIPTION
 
 The B<MANA_LIKELY(I<cond>)> and B<MANA_UNLIKELY(I<cond>)> macros wrap a compiler
@@ -31,6 +34,10 @@ supporting the standard attributes.
 
 The B<MANA_ABYSS()> macro tells the compatible compilers that the code there is
 unreachable.
+
+The macros B<MANA_PURE()> and B<MANA_CONST()> expand to GNU specific pure and
+const function attributes (C<[[gnu::pure]]> and C<[[gnu::const]]> respectively)
+or nothing if not on a GNU compatible compiler.
 
 =head1 EXAMPLES
 

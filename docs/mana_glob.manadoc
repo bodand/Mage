@@ -1,0 +1,175 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mana::source_glob - ManaVM globbing API
+
+=head1 SYNOPSIS
+
+ #include <mana/source_scanner.hxx>
+ mana::source_glob::source_glob(std::string_view glob_str,
+                                std::filesystem::file_time_type last_globbed);
+
+ std::vector<std::filesystem::path>
+ mana::source_glob::operator()() const;
+ bool
+ mana::source_glob::cacheable() const;
+ std::string
+ mana::source_glob::glob();
+ td::filesystem::path
+ mana::source_glob::in_dir();
+
+ std::filesystem::file_time_type
+ mana::source_glob::last_globbed;
+
+=head1 DESCRIPTION
+
+Quick forewarning:
+While globbing is specified by POSIX, ManaVM does not use the system's
+provided L<glob(3)> interface. (Or its equivalent on Windows.) I do not
+know whether this changes performance of globbing in any direction (probably we are slower),
+but do read the globbing spec to ensure you get what you expect from the
+botched glob expression in ManaVM.
+
+To glob in ManaVM just specify the globbing expression and a point in time on
+the L<< H<std::chrono::>B<file_clock>|https://en.cppreference.com/w/cpp/chrono/file_clock >>
+to the constructor of H<mana::>B<source_glob>.
+The second argument represents at what point the globbing was performed last.
+In case you don't care about the cross-run caching capabilities this argument
+can be just set to C<{}>, otherwise it is used to report whether new globbing
+is necessary, or if the results you currently have (from an external cache) are
+valid, therefore, if you do not already have the previously reported files this
+option is useless for your usecase.
+
+After constructing the H<mana::>B<source_glob> object, you can use it to do
+two things: call H<mana::source_glob::>B<operator()>() on it, or check your
+cache's validity with H<mana::source_glob::>B<cacheable>().
+
+Additionally the public member H<mana::source_glob::>B<last_globbed> is
+available; modifications will change how ManaVM treats the last globbing date,
+however, do note that this gets overwritten by each executed glob operation.
+
+=head2 Accepted glob syntax
+
+ManaVM glob spec is not POSIX, for its lazy in two ways: it evaluates lazily,
+and it was the result me being lazy. If deemed necessary in the future this can
+be rewritten. (should probably be - date: 2021)
+
+All characters match themselves except the select set of metacharacters which
+match (maybe-)not themselves according to their description below.
+
+The special case is the directory separator /. This is a meta-metacharacter: the
+globbing string is taken apart into sections for the glob expression and the
+directory, this allows us to minimize the amount of things to test against and
+specifying the root directory more accurately. This however still allows for
+globbing for directories: C<*/a.txt> still matches all F<a.txt>-s one directory
+deep in I<pwd>. What it does not allow is leaking through directories: a C<*>
+can never match into a directory below or above the directory it was called in.
+
+The following metacharacters are accepted:
+
+=over 2
+
+=item Z<>C<*>
+
+Globs lazily (B<!>) until it matches the code-point that is following it or the
+end of the string if placed last in the glob expression. Never backtracks.
+Auto-escapes the character following it such that C<*?> is equivalent to C<*\?>.
+
+=item C<?>
+
+Matches any one code-point.
+
+=item C<\>
+
+Escapes the following character. If its a metacharacter it will not be interpreted
+as such, otherwise nothing changes.
+
+=item C<[...]>
+
+A character class that matches all characters inside the C<...>. These contents
+are considered literally, the only character treated specially is the closing
+C<]>, which closes the class. It can be inserted into the class by placing it
+as the first character: C<[]more chars]>.
+
+If an unclosed character class is encountered, a C<mana::bad_glob> exception
+is thrown.
+
+=back
+
+=head1 FUNCTIONS
+
+=over 2
+
+=item H<mana::source_glob::>B<source_glob>(H<std::>B<string_view> I<glob_str>,
+                                           H<std::filesystem::>B<file_time_type> I<last_globbed>)
+
+Constructs an object of H<mana::>B<source_glob>. The I<glob_str> is a string
+that contains the globbing expression to use. If the glob is relative, as
+in does not specify an absolute path using UNIX syntax with an optional drive
+on Windows' NTFS, VMS' Files-11, and other multi-rooted filesystems.
+
+The glob expression is then processed marginally, but not compiled, to separate
+the directory in which the globbing expression takes place, and the glob
+expression: this allows the glob library to allow the user to cache glob results.
+See L</bool mana::source_glob::cacheable()> for more information about cacheability
+of results.
+
+Directory is decided by finding the first glob metacharacter and the the last
+directory in which that resides in. In relative paths the first directory is
+always the working directory for the purposes of this check. For example the
+followings show which globs return which paths, where B<pwd> is
+the result of H<std::filesystem::>B<current_path>():
+
+=table glob string   T<> directory T<> glob expression
+
+=row *.cxx           T<> I<pwd>       T<> *.cxx
+
+=row a/b/*.c         T<> I<pwd>/a/b   T<> *.c
+
+=row a/*/foo         T<> I<pwd>/a     T<> */foo
+
+=row /abs/path/*.hpp T<> /abs/path T<> *.hpp
+
+=item bool H<mana::source_glob::>B<cacheable>()
+
+ManaVM stores the directories in which globbing takes place. If the globbing
+does not enter subdirectories, this member function returns whether the glob
+directory's modification time is older than our H<mana::source_glob::>B<last_globbed>.
+In cases of globbing subdirectories, all subdirectories in which files are
+matched are checked any if any of their modification times is newer than our
+H<mana::source_glob::>B<last_globbed> this function returns false.
+
+[note: Availability of this feature is checked at configure-time of ManaVM and
+in case any of the followings do not hold for the filesystem/os, this member
+function always returns epoch time of H<std::chrono::>B<file_clock>.
+
+=over 2
+
+=item *
+
+H<std::filesystem>::last_write_time(E<lt>dirE<gt>) changes in case a file is added to <dir>
+
+=item *
+
+H<std::filesystem>::last_write_time(E<lt>dirE<gt>) changes in case a file is removed from <dir>
+
+=item *
+
+H<std::filesystem>::last_write_time(E<lt>dirE<gt>) changes in case a file is renamed in <dir>
+
+=back
+
+--end note]
+
+=item  H<std::>B<vector>E<gt>H<std::filesystem::>B<path>E<gt> H<mana::source_glob::>B<operator()>()
+
+Performs the globbing operation. The glob expression is compiled at this step,
+and is cached externally per thread: compiling each pattern is only going to
+take time once on each thread.
+
+=back
+
+=cut

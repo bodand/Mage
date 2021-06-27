@@ -63,7 +63,13 @@ If you already have a Mage available, the following is likely your way:
 =head1 DOCUMENTATION
 
 Documentation both for ManaVM's API and for Chalk (the name of the language
-used in F<Ritualfile>) in the F<docs/> directory in POD format.
+used in F<Ritualfile>) in the F<docs/> directory in Mana::Doc format, which
+is a slight superset of Perl's POD format.
+
+The I<build-docs> target is created if C<MAGE_BUILD_DOCS> is true on configuration
+with CMake, the documentation can be built into HTML. This requires Perl and
+the L<Mana::Doc|https://github.com/bodand/Mana-Doc> package to be installed.
+(As of now it is not on CPAN, so you'll have to do it manually or use B<cpanm>.)
 
 =head1 LICENSE
 
